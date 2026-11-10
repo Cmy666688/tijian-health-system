@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neusoft.tijiancms.mapper.DoctorMapper">
+  <select id="findProfile" resultType="Doctor">SELECT docId,docCode,realName,sex,deptno FROM doctor WHERE docCode=#{docCode}</select>
+  <select id="findCredentials" resultType="Doctor">SELECT docId,docCode,realName,password,sex,deptno FROM doctor WHERE docCode=#{docCode}</select>
+  <update id="upgradePassword">UPDATE doctor SET password=#{newPassword} WHERE docCode=#{docCode} AND BINARY password=BINARY #{oldPassword}</update>
+</mapper>

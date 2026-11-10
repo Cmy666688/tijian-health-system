@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neusoft.tijian.mapper.ScheduleMapper">
+  <select id="list" resultType="HospitalSchedule">SELECT weekday,dailyCapacity FROM hospital_schedule WHERE hpId=#{hpId}</select>
+  <select id="capacity" resultType="int">SELECT dailyCapacity FROM hospital_schedule WHERE hpId=#{hpId} AND weekday=#{weekday}</select>
+  <select id="countDay" resultType="int">SELECT COUNT(*) FROM orders WHERE hpId=#{hpId} AND orderDate=#{date}</select>
+  <select id="countMonth" resultType="DailyBooked">SELECT orderDate,COUNT(*) AS bookedCount FROM orders WHERE hpId=#{hpId} AND orderDate &gt;= #{start} AND orderDate &lt; #{end} GROUP BY orderDate</select>
+</mapper>

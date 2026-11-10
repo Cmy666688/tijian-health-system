@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neusoft.tijiancms.mapper.ReportMapper">
+  <resultMap id="reportMap" type="CiReport">
+    <id property="cirId" column="report_id"/>
+    <result property="ciId" column="item_id"/>
+    <result property="ciName" column="item_name"/>
+    <result property="orderId" column="report_order_id"/>
+    <collection property="details" ofType="CiDetailedReport" notNullColumn="detail_id">
+      <id property="cidrId" column="detail_id"/>
+      <result property="name" column="detail_name"/>
+      <result property="unit" column="detail_unit"/>
+      <result property="minrange" column="detail_min"/>
+      <result property="maxrange" column="detail_max"/>
+      <result property="normalValue" column="detail_normal"/>
+      <result property="normalValueString" column="detail_normal_text"/>
+      <result property="type" column="detail_type"/>
+      <result property="value" column="detail_value"/>
+      <result property="isError" column="detail_error"/>
+      <result property="ciId" column="detail_report_id"/>
+      <result property="orderId" column="detail_order_id"/>
+    </collection>
+  </resultMap>
+  <select id="listOverallResults" resultType="OverallResult">
+    SELECT orId,title,content,orderId FROM overallresult WHERE orderId=#{orderId} ORDER BY orId
+  </select>
+  <select id="listCiReports" resultMap="reportMap">
+    SELECT r.cirId AS report_id, r.ciId AS item_id, r.ciName AS item_name, r.orderId AS report_order_id,
+      d.cidrId AS detail_id, d.name AS detail_name, d.unit AS detail_unit,
+      d.minrange AS detail_min, d.maxrange AS detail_max, d.normalValue AS detail_normal,
+      d.normalValueString AS detail_normal_text, d.type AS detail_type, d.value AS detail_value,
+      d.isError AS detail_error, d.ciId AS detail_report_id, d.orderId AS detail_order_id
+    FROM cireport r LEFT JOIN cidetailedreport d ON d.ciId=r.cirId AND d.orderId=r.orderId
+    WHERE r.orderId=#{orderId} ORDER BY r.cirId,d.cidrId
+  </select>
+  <select id="lockOrderState" resultType="int">SELECT state FROM orders WHERE orderId=#{orderId} FOR UPDATE</select>
+  <select id="countReports" resultType="int">SELECT COUNT(*) FROM cireport WHERE orderId=#{orderId}</select>
+  <select id="countDetails" resultType="int">SELECT COUNT(*) FROM cidetailedreport WHERE orderId=#{orderId}</select>
+  <select id="countMissingDetails" resultType="int">SELECT COUNT(*) FROM cidetailedreport WHERE orderId=#{orderId} AND (value IS NULL OR TRIM(value)='')</select>
+  <select id="countOverall" resultType="int">SELECT COUNT(*) FROM overallresult WHERE orderId=#{orderId}</select>
+  <insert id="createItems">INSERT INTO cireport(ciId,ciName,orderId)
+    SELECT c.ciId,c.ciName,o.orderId FROM orders o JOIN setmealdetailed sd ON sd.smId=o.smId
+    JOIN checkitem c ON c.ciId=sd.ciId WHERE o.orderId=#{orderId}</insert>
+  <insert id="createDetails">INSERT INTO cidetailedreport(name,unit,minrange,maxrange,normalValue,normalValueString,type,value,isError,ciId,orderId)
+    SELECT d.name,d.unit,d.minrange,d.maxrange,d.normalValue,d.normalValueString,d.type,NULL,0,r.cirId,r.orderId
+    FROM cireport r JOIN checkitemdetailed d ON d.ciId=r.ciId WHERE r.orderId=#{orderId}</insert>
+  <insert id="insertOverall" parameterType="OverallResult" useGeneratedKeys="true" keyProperty="orId">INSERT INTO overallresult(title,content,orderId) VALUES(#{title},#{content},#{orderId})</insert>
+  <update id="updateOverall">UPDATE overallresult SET title=#{title}, content=#{content} WHERE orId=#{orId} AND orderId=#{orderId}</update>
+  <delete id="deleteOverall">DELETE FROM overallresult WHERE orId=#{orId} AND orderId=#{orderId}</delete>
+  <update id="updateDetail">UPDATE cidetailedreport SET value=#{value},isError=#{isError} WHERE cidrId=#{cidrId} AND ciId=#{ciId} AND orderId=#{orderId}</update>
+</mapper>

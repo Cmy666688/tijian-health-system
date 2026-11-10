@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neusoft.tijian.mapper.ReportMapper">
+  <resultMap id="reportMap" type="CiReport">
+    <id property="cirId" column="report_id"/>
+    <result property="ciId" column="item_id"/>
+    <result property="ciName" column="item_name"/>
+    <result property="orderId" column="report_order_id"/>
+    <collection property="details" ofType="CiDetailedReport" notNullColumn="detail_id">
+      <id property="cidrId" column="detail_id"/>
+      <result property="name" column="detail_name"/>
+      <result property="unit" column="detail_unit"/>
+      <result property="minrange" column="detail_min"/>
+      <result property="maxrange" column="detail_max"/>
+      <result property="normalValue" column="detail_normal"/>
+      <result property="normalValueString" column="detail_normal_text"/>
+      <result property="type" column="detail_type"/>
+      <result property="value" column="detail_value"/>
+      <result property="isError" column="detail_error"/>
+      <result property="ciId" column="detail_report_id"/>
+      <result property="orderId" column="detail_order_id"/>
+    </collection>
+  </resultMap>
+  <select id="listOverallResults" resultType="OverallResult">
+    SELECT orId,title,content,orderId FROM overallresult WHERE orderId=#{orderId} ORDER BY orId
+  </select>
+  <select id="listCiReports" resultMap="reportMap">
+    SELECT r.cirId AS report_id, r.ciId AS item_id, r.ciName AS item_name, r.orderId AS report_order_id,
+      d.cidrId AS detail_id, d.name AS detail_name, d.unit AS detail_unit,
+      d.minrange AS detail_min, d.maxrange AS detail_max, d.normalValue AS detail_normal,
+      d.normalValueString AS detail_normal_text, d.type AS detail_type, d.value AS detail_value,
+      d.isError AS detail_error, d.ciId AS detail_report_id, d.orderId AS detail_order_id
+    FROM cireport r LEFT JOIN cidetailedreport d ON d.ciId=r.cirId AND d.orderId=r.orderId
+    WHERE r.orderId=#{orderId} ORDER BY r.cirId,d.cidrId
+  </select>
+</mapper>

@@ -1,0 +1,2 @@
+const { defineConfig } = require('@vue/cli-service')
+module.exports = defineConfig({ transpileDependencies: true, devServer: { host: '127.0.0.1', port: 8081, proxy: { '/tijian': { target: 'http://127.0.0.1:8080', changeOrigin: true } } } })

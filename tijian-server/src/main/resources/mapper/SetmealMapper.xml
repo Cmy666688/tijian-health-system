@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neusoft.tijian.mapper.SetmealMapper">
+  <select id="listByType" resultType="Setmeal">SELECT smId, name, type, price FROM setmeal WHERE type = #{type} ORDER BY smId</select>
+  <select id="findById" resultType="Setmeal">SELECT smId, name, type, price FROM setmeal WHERE smId = #{smId}</select>
+  <resultMap id="checkItemMap" type="CheckItem">
+    <id property="ciId" column="item_id"/>
+    <result property="ciName" column="item_name"/>
+    <result property="ciContent" column="item_content"/>
+    <result property="meaning" column="item_meaning"/>
+    <collection property="details" ofType="CheckItemDetail" notNullColumn="detail_id">
+      <id property="cdId" column="detail_id"/>
+      <result property="name" column="detail_name"/>
+      <result property="unit" column="detail_unit"/>
+      <result property="normalValueString" column="detail_range"/>
+    </collection>
+  </resultMap>
+  <select id="listCheckItems" resultMap="checkItemMap">
+    SELECT c.ciId AS item_id,c.ciName AS item_name,c.ciContent AS item_content,c.meaning AS item_meaning,
+      d.cdId AS detail_id,d.name AS detail_name,d.unit AS detail_unit,d.normalValueString AS detail_range
+    FROM setmealdetailed s JOIN checkitem c ON c.ciId=s.ciId
+    LEFT JOIN checkitemdetailed d ON d.ciId=c.ciId
+    WHERE s.smId=#{smId} ORDER BY c.ciId,d.cdId
+  </select>
+</mapper>

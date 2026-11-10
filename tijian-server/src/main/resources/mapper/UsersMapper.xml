@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neusoft.tijian.mapper.UsersMapper">
+  <select id="findById" resultType="Users">SELECT userId FROM users WHERE userId = #{userId}</select>
+  <select id="findProfile" resultType="Users">SELECT userId,realName,sex,identityCard,birthday,userType FROM users WHERE userId=#{userId}</select>
+  <select id="findCredentials" resultType="Users">SELECT userId,password,realName,sex,identityCard,birthday,userType FROM users WHERE userId=#{userId}</select>
+  <update id="upgradePassword">UPDATE users SET password=#{newPassword} WHERE userId=#{userId} AND BINARY password=BINARY #{oldPassword}</update>
+  <insert id="insert" parameterType="Users">INSERT INTO users (userId, password, realName, sex, identityCard, birthday, userType) VALUES (#{userId}, #{password}, #{realName}, #{sex}, #{identityCard}, #{birthday}, #{userType})</insert>
+</mapper>

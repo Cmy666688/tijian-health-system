@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neusoft.tijiancms.mapper.OrdersMapper">
+  <sql id="filters"><where>
+    <if test="filter.userId != null and filter.userId != ''">AND o.userId = #{filter.userId}</if>
+    <if test="filter.state != null">AND o.state = #{filter.state}</if>
+    <if test="filter.smId != null">AND o.smId = #{filter.smId}</if>
+    <if test="filter.realName != null and filter.realName != ''">AND INSTR(COALESCE(o.patientName,u.realName), #{filter.realName}) &gt; 0</if>
+    <if test="filter.sex != null">AND COALESCE(o.patientSex,u.sex) = #{filter.sex}</if>
+    <if test="filter.orderDate != null">AND o.orderDate = #{filter.orderDate}</if>
+  </where></sql>
+  <sql id="columns">o.orderId,o.orderDate,o.userId,o.hpId,o.smId,o.state,o.patientType,COALESCE(o.patientName,u.realName) AS realName,COALESCE(o.patientSex,u.sex) AS sex,u.realName AS bookingName,h.name AS hospitalName,s.name AS setmealName</sql>
+  <sql id="joins">FROM orders o JOIN users u ON u.userId=o.userId JOIN hospital h ON h.hpId=o.hpId JOIN setmeal s ON s.smId=o.smId</sql>
+  <select id="count" resultType="long">SELECT COUNT(*) FROM orders o JOIN users u ON u.userId=o.userId <include refid="filters"/></select>
+  <select id="list" resultType="Orders">SELECT <include refid="columns"/> <include refid="joins"/> <include refid="filters"/> ORDER BY o.orderDate DESC,o.orderId DESC LIMIT #{limit} OFFSET #{offset}</select>
+  <select id="findById" resultType="Orders">SELECT <include refid="columns"/>, COALESCE(o.patientIdentityCard,u.identityCard) AS patientIdentityCard, COALESCE(o.patientBirthday,u.birthday) AS patientBirthday <include refid="joins"/> WHERE o.orderId=#{orderId}</select>
+  <update id="updateState">UPDATE orders SET state=#{state} WHERE orderId=#{orderId} AND state = 1 AND #{state} = 2</update>
+</mapper>
