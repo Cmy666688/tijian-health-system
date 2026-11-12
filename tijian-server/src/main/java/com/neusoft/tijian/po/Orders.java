@@ -1,6 +1,8 @@
 package com.neusoft.tijian.po;
 import java.time.LocalDate;
 public class Orders {
+    private String paymentStatus;
+    private java.math.BigDecimal paymentAmount;
     private Integer orderId;
     private LocalDate orderDate;
     private String userId;
@@ -12,6 +14,10 @@ public class Orders {
     private Integer patientSex;
     private String patientIdentityCard;
     private LocalDate patientBirthday;
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String value) { paymentStatus=value; }
+    public java.math.BigDecimal getPaymentAmount() { return paymentAmount; }
+    public void setPaymentAmount(java.math.BigDecimal value) { paymentAmount=value; }
     public Integer getOrderId() { return orderId; }
     public void setOrderId(Integer value) { this.orderId = value; }
     public LocalDate getOrderDate() { return orderDate; }

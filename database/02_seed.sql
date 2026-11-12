@@ -16,3 +16,5 @@ INSERT INTO hospital_schedule (hpId,weekday,dailyCapacity)
 SELECT hpId, weekdays.weekday, 20 FROM hospital
 CROSS JOIN (SELECT 1 AS weekday UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) weekdays
 WHERE hpId=1 AND name='东软健康体检中心';
+
+UPDATE doctor_schedule SET docCode='doctor01' WHERE profileId='doctor-01';

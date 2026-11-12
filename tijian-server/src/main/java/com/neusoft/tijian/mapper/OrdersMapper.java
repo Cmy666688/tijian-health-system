@@ -8,6 +8,7 @@ public interface OrdersMapper {
     String lockUser(@Param("userId") String userId);
     Integer lockHospital(@Param("hpId") Integer hpId);
     int countOpen(@Param("userId") String userId);
+    int countOpenByPatient(@Param("userId") String userId, @Param("identityCard") String identityCard);
     int insert(Orders order);
     List<Orders> list(@Param("userId") String userId, @Param("state") Integer state);
     Orders findById(@Param("orderId") Integer orderId);

@@ -32,7 +32,6 @@ public class OrdersService {
         if (mapper.lockUser(order.getUserId()) == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "用户不存在");
         // 同一医院的预约串行化；首次一致性读取在获取医院锁后，避免并发超额。
         if (mapper.lockHospital(order.getHpId()) == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "医院不存在或未开放");
-        if (mapper.countOpen(order.getUserId()) > 0) throw new ResponseStatusException(HttpStatus.CONFLICT, "已有未归档预约");
         if (order.getPatientType()==null) order.setPatientType(1);
         if (order.getPatientType()==1) {
             Users profile=users.findProfile(order.getUserId());
@@ -47,6 +46,7 @@ public class OrdersService {
             order.setPatientName(order.getPatientName().trim());
             order.setPatientIdentityCard(order.getPatientIdentityCard().toUpperCase(java.util.Locale.ROOT));
         } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"体检人类型无效");
+        if (mapper.countOpenByPatient(order.getUserId(),order.getPatientIdentityCard()) > 0) throw new ResponseStatusException(HttpStatus.CONFLICT, "该体检人已有未归档预约");
         Hospital hospital = hospitals.findById(order.getHpId());
         if (hospital == null || hospital.getState() != 1) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "医院不存在或未开放");
         if (meals.findById(order.getSmId()) == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "套餐不存在");

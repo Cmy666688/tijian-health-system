@@ -32,7 +32,7 @@ class OrdersServiceTest {
         OrdersService service=new OrdersService(orders,hospitals,meals,users,schedules);
         ResponseStatusException error=assertThrows(ResponseStatusException.class,()->service.create(order));
         assertEquals(HttpStatus.CONFLICT,error.getStatus()); verify(orders,never()).insert(any());
-        InOrder sequence=inOrder(orders); sequence.verify(orders).lockUser(order.getUserId()); sequence.verify(orders).lockHospital(1); sequence.verify(orders).countOpen(order.getUserId());
+        InOrder sequence=inOrder(orders); sequence.verify(orders).lockUser(order.getUserId()); sequence.verify(orders).lockHospital(1); sequence.verify(orders).countOpenByPatient(eq(order.getUserId()),anyString());
     }
     @Test void familyAppointmentUsesSuppliedPatientAndRejectsInvalidId() {
         OrdersMapper orders=mock(OrdersMapper.class); HospitalMapper hospitals=mock(HospitalMapper.class);

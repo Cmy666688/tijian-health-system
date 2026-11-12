@@ -36,3 +36,6 @@ INSERT INTO cireport(ciId,ciName,orderId) SELECT c.ciId,c.ciName,o.orderId FROM 
 INSERT INTO cidetailedreport(name,unit,minrange,maxrange,normalValue,normalValueString,type,value,isError,ciId,orderId) SELECT d.name,d.unit,d.minrange,d.maxrange,d.normalValue,d.normalValueString,d.type,CASE WHEN d.name='身高' THEN '170' WHEN d.name='体重' THEN '65' WHEN d.name='白细胞计数' THEN '偏高' ELSE '正常' END,CASE WHEN d.name='白细胞计数' THEN 1 ELSE 0 END,r.cirId,r.orderId FROM cireport r JOIN checkitemdetailed d ON d.ciId=r.ciId WHERE r.orderId IN (@demo_order1,@demo_order2);
 INSERT INTO overallresult(title,content,orderId) VALUES ('总检结论','体检报告已完成，请查看各项检查结果。',@demo_order1),('总检结论','体检报告已完成，请查看各项检查结果。',@demo_order2);
 COMMIT;
+
+-- 关联项目内医生账号和排班编号。
+UPDATE doctor_schedule SET docCode=CASE profileId WHEN 'doctor-01' THEN 'doctor01' WHEN 'doctor-02' THEN 'doctor02' WHEN 'doctor-03' THEN 'doctor03' ELSE NULL END;

@@ -4,8 +4,9 @@
   <select id="lockUser" resultType="string">SELECT userId FROM users WHERE userId = #{userId} FOR UPDATE</select>
   <select id="lockHospital" resultType="int">SELECT hpId FROM hospital WHERE hpId=#{hpId} FOR UPDATE</select>
   <select id="countOpen" resultType="int">SELECT COUNT(*) FROM orders WHERE userId = #{userId} AND state = 1</select>
-  <insert id="insert" parameterType="Orders" useGeneratedKeys="true" keyProperty="orderId">INSERT INTO orders (orderDate,userId,hpId,smId,state,patientType,patientName,patientSex,patientIdentityCard,patientBirthday) VALUES (#{orderDate},#{userId},#{hpId},#{smId},1,#{patientType},#{patientName},#{patientSex},#{patientIdentityCard},#{patientBirthday})</insert>
-  <select id="list" resultType="Orders">SELECT orderId,orderDate,userId,hpId,smId,state,patientType,patientName,patientSex,patientIdentityCard,patientBirthday FROM orders WHERE userId=#{userId} AND state=#{state} ORDER BY orderDate DESC,orderId DESC</select>
-  <select id="findById" resultType="Orders">SELECT orderId,orderDate,userId,hpId,smId,state,patientType,patientName,patientSex,patientIdentityCard,patientBirthday FROM orders WHERE orderId=#{orderId}</select>
-  <delete id="deleteOpen">DELETE FROM orders WHERE orderId=#{orderId} AND userId=#{userId} AND state=1</delete>
+  <select id="countOpenByPatient" resultType="int">SELECT COUNT(*) FROM orders o JOIN users u ON u.userId=o.userId WHERE o.userId=#{userId} AND o.state=1 AND UPPER(COALESCE(o.patientIdentityCard,u.identityCard))=UPPER(#{identityCard})</select>
+  <insert id="insert" parameterType="Orders" useGeneratedKeys="true" keyProperty="orderId">INSERT INTO orders (orderDate,userId,hpId,smId,state,patientType,patientName,patientSex,patientIdentityCard,patientBirthday,paymentStatus,paymentAmount) SELECT #{orderDate},#{userId},#{hpId},#{smId},1,#{patientType},#{patientName},#{patientSex},#{patientIdentityCard},#{patientBirthday},'UNPAID',price FROM setmeal WHERE smId=#{smId}</insert>
+  <select id="list" resultType="Orders">SELECT orderId,orderDate,userId,hpId,smId,state,patientType,patientName,patientSex,patientIdentityCard,patientBirthday,paymentStatus,paymentAmount FROM orders WHERE userId=#{userId} AND state=#{state} ORDER BY orderDate DESC,orderId DESC</select>
+  <select id="findById" resultType="Orders">SELECT orderId,orderDate,userId,hpId,smId,state,patientType,patientName,patientSex,patientIdentityCard,patientBirthday,paymentStatus,paymentAmount FROM orders WHERE orderId=#{orderId}</select>
+  <update id="deleteOpen">UPDATE orders SET state=3, paymentStatus=CASE WHEN paymentStatus='PAID' THEN 'REFUNDED' ELSE 'CANCELLED' END WHERE orderId=#{orderId} AND userId=#{userId} AND state=1 AND NOT EXISTS (SELECT 1 FROM cireport WHERE orderId=#{orderId})</update>
 </mapper>

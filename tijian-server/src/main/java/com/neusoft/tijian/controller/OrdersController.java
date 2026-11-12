@@ -26,9 +26,10 @@ public class OrdersController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"医院、套餐和预约日期必填");
         return service.create(o);
     }
+    @PostMapping("/savePendingOrder") public java.util.Map<String,Object> savePendingOrder(@RequestBody Orders o, HttpServletRequest request) { saveOrders(o,request); return java.util.Collections.singletonMap("orderId",o.getOrderId()); }
     @PostMapping("/listOrdersByUserId") public List<Orders> list(@RequestBody Orders o, HttpServletRequest request) {
         user(o); access.requireUser(request,o.getUserId());
-        if (o.getState()==null || (o.getState()!=1 && o.getState()!=2)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"状态须为1或2");
+        if (o.getState()==null || (o.getState()!=1 && o.getState()!=2 && o.getState()!=3)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"状态须为1、2或3");
         return service.list(o.getUserId(),o.getState());
     }
     @PostMapping("/getOrdersById") public Orders get(@RequestBody Orders o, HttpServletRequest request) { id(o); return access.requireOrder(request,o.getOrderId(),false); }

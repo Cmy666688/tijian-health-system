@@ -33,7 +33,7 @@
     FROM cireport r LEFT JOIN cidetailedreport d ON d.ciId=r.cirId AND d.orderId=r.orderId
     WHERE r.orderId=#{orderId} ORDER BY r.cirId,d.cidrId
   </select>
-  <select id="lockOrderState" resultType="int">SELECT state FROM orders WHERE orderId=#{orderId} FOR UPDATE</select>
+  <select id="lockOrderState" resultType="int">SELECT state FROM orders WHERE orderId=#{orderId} AND paymentStatus='PAID' FOR UPDATE</select>
   <select id="countReports" resultType="int">SELECT COUNT(*) FROM cireport WHERE orderId=#{orderId}</select>
   <select id="countDetails" resultType="int">SELECT COUNT(*) FROM cidetailedreport WHERE orderId=#{orderId}</select>
   <select id="countMissingDetails" resultType="int">SELECT COUNT(*) FROM cidetailedreport WHERE orderId=#{orderId} AND (value IS NULL OR TRIM(value)='')</select>
